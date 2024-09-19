@@ -2,7 +2,7 @@
 
 public class Tetris
 {
-    private Tetromino _currentTetromino;
+    private Tetromino? _currentTetromino;
     private Position _startPosition { get; }
     
     private Grid _grid;
@@ -16,26 +16,29 @@ public class Tetris
 
     public void AddTetromino(Tetromino tetromino)
     {
-        if (_currentTetromino != null)
-            throw new Exception("Tetromino already present in grid");
-        
         tetromino.SetOnGrid(_startPosition); 
         _currentTetromino = tetromino;
     }
 
     public void Play()
     {
-       var oldCells = _currentTetromino.GetAbsolutePositions();
-       _grid.Free(oldCells);
+        if(_currentTetromino == null)
+            AddTetromino(Tetromino.CreateSquareTetromino());
+        
+        var oldCells = _currentTetromino!.GetAbsolutePositions();
+        _grid.Free(oldCells);
        
-       FallDown();
-       
-       var newCells = _currentTetromino.GetAbsolutePositions();
-       _grid.Fill(newCells);
+        if (_grid.CanMoveDown(_currentTetromino))
+            FallDown();
+        else  
+            AddTetromino(Tetromino.CreateSquareTetromino());
+        
+        var newCells = _currentTetromino.GetAbsolutePositions();
+        _grid.Fill(newCells);
     }
     
     private void FallDown()
     {
-        _currentTetromino.CurrentPosition!.Add(new Position(0, -1));
+        _currentTetromino!.CurrentPosition!.Add(new Position(0, -1));
     }
 }

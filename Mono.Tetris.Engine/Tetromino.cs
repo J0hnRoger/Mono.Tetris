@@ -13,7 +13,7 @@ public class Tetromino
     
     public void SetOnGrid(Position position)
     {
-        CurrentPosition = position;
+        CurrentPosition = new Position(position);
     }
 
     public List<Position> GetAbsolutePositions()
@@ -28,5 +28,17 @@ public class Tetromino
                 return newPosition;
             })
             .ToList();
-    } 
+    }
+
+    public static Tetromino CreateSquareTetromino()
+    {
+        var square = new List<Cell>
+        {
+            new(0, 0, true),
+            new(0, 1, true),
+            new(1, 0, true),
+            new(1, 1, true),
+        };
+        return new Tetromino(square);
+    }
 }
