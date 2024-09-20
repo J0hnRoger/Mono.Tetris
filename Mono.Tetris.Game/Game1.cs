@@ -126,7 +126,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
         {
             // Calculer la position sur l'écran
             int screenX = cell.Position.X * cellSize;
-            int screenY = (grid.Rows - cell.Position.Y) * cellSize;
+            int screenY = (grid.Rows - cell.Position.Y - 1) * cellSize;
 
             // Choisir une couleur pour la cellule (par exemple, Color.Gray pour les cellules vides)
             Color color = cell.Filled ? cell.Color.GetMonoGameColorByName() ?? Color.Gray : Color.Gray;

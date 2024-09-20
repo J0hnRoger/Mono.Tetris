@@ -34,7 +34,7 @@ public class Grid
         //outside of the grid
         if (cell == null)
             return;
-        
+
         cell.Color = color;
         cell.Filled = filled;
     }
@@ -80,5 +80,75 @@ public class Grid
         }
 
         return false; // Pas de collision
+    }
+
+    public void CheckForCompletedLines()
+    {
+        for (int y = 0; y < Rows; y++)
+        {
+            if (IsLineComplete(y))
+            {
+                ClearLine(y);
+                MoveLinesDown(y);
+            }
+        }
+    }
+
+    private void ClearLine(int y)
+    {
+        // Libérer toutes les cellules de la ligne 'y'
+        for (int x = 0; x < Columns; x++)
+        {
+            var cell = GetCell(new Position(x, y));
+            if (cell != null)
+            {
+                cell.Filled = false; // Libérer la cellule
+            }
+        }
+    }
+
+    private void MoveLinesDown(int startY)
+    {
+        // Déplacer toutes les lignes au-dessus de la ligne 'startY' vers le bas
+        for (int y = startY; y < Rows - 1; y++)
+        {
+            for (int x = 0; x < Columns; x++)
+            {
+                var currentCell = GetCell(new Position(x, y));
+                var aboveCell = GetCell(new Position(x, y + 1));
+
+                if (currentCell != null && aboveCell != null)
+                {
+                    // Copier l'état de la cellule au-dessus
+                    currentCell.Filled = aboveCell.Filled;
+                    currentCell.Color = aboveCell.Color; // Si tu as une couleur par cellule
+                }
+            }
+        }
+
+        // Vider la première ligne (tout en haut)
+        for (int x = 0; x < Columns; x++)
+        {
+            var cell = GetCell(new Position(x, Rows - 1));
+            if (cell != null)
+            {
+                cell.Filled = false;
+            }
+        }
+    }
+
+    private bool IsLineComplete(int y)
+    {
+        // Vérifier si toutes les cellules de la ligne 'y' sont remplies
+        for (int x = 0; x < Columns; x++)
+        {
+            var cell = GetCell(new Position(x, y));
+            if (cell == null || !cell.Filled)
+            {
+                return false; // Si une cellule n'est pas remplie, la ligne n'est pas complète
+            }
+        }
+
+        return true; // Toutes les cellules sont remplies, la ligne est complète
     }
 }

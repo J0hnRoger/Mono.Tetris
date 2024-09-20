@@ -35,7 +35,9 @@ public class Tetris
         else
         {
             // On remet l'ancien tetromino
+            
             _grid.Fill(oldCells, _currentTetromino.Color);
+            _grid.CheckForCompletedLines();
             AddTetromino(Tetromino.CreateSquareTetromino());
         }
 
