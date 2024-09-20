@@ -18,22 +18,24 @@ public class Grid
     }
 
 
-    public void Fill(List<Position> positions)
+    public void Fill(List<Position> positions, Color color)
     {
-        positions.ForEach(p => SetFilled(p, true));
+        positions.ForEach(p => SetFilled(p, true, color));
     }
 
     public void Free(List<Position> positions)
     {
-        positions.ForEach(p => SetFilled(p, false));
+        positions.ForEach(p => SetFilled(p, false, new Color("Grey")));
     }
 
-    public void SetFilled(Position position, bool filled)
+    public void SetFilled(Position position, bool filled, Color color)
     {
         var cell = GetCell(position);
         //outside of the grid
         if (cell == null)
             return;
+        
+        cell.Color = color;
         cell.Filled = filled;
     }
 
@@ -51,7 +53,7 @@ public class Grid
                 return false;
 
             // Vérifie si une cellule en dessous est occupée
-            var cellBelow = GetCell(new Position(pos.X, pos.Y));
+            var cellBelow = GetCell(new Position(pos.X, pos.Y - 1));
             if (cellBelow != null && cellBelow.Filled)
                 return false;
         }
@@ -61,6 +63,22 @@ public class Grid
 
     public bool Collide(Tetromino tetromino)
     {
-        return false;
+        foreach (var pos in tetromino.GetAbsolutePositions())
+        {
+            // Vérification des limites de la grille (X entre 0 et Columns-1, Y entre 0 et Rows-1)
+            if (pos.X < 0 || pos.X >= Columns || pos.Y < 0 || pos.Y >= Rows)
+            {
+                return true; // Collision avec les bords
+            }
+
+            // Vérification des cellules déjà remplies
+            var cell = GetCell(pos);
+            if (cell != null && cell.Filled)
+            {
+                return true; // Collision avec une cellule déjà occupée
+            }
+        }
+
+        return false; // Pas de collision
     }
 }
