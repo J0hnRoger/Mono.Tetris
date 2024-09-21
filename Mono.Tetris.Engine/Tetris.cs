@@ -35,7 +35,7 @@ public class Tetris
         else
         {
             // On remet l'ancien tetromino
-            
+
             _grid.Fill(oldCells, _currentTetromino.Color);
             _grid.CheckForCompletedLines();
             AddTetromino(Tetromino.CreateSquareTetromino());
@@ -65,7 +65,8 @@ public class Tetris
         // Remplir la grille avec la position finale du tetromino
         var finalCells = _currentTetromino.GetAbsolutePositions();
         _grid.Fill(finalCells, _currentTetromino.Color);
-
+        
+        _grid.CheckForCompletedLines();
         // Le tetromino est maintenant fixé, on génère un nouveau tetromino
         _currentTetromino = null;
         AddTetromino(Tetromino.CreateRandomTetromino());
