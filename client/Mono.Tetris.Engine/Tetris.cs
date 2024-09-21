@@ -4,6 +4,8 @@ public class Tetris
 {
     private Tetromino? _currentTetromino;
     private Position _startPosition { get; }
+    
+    public Action<Tetromino> OnTetrominoAdded;
 
     private Grid _grid;
     public Grid Render() => _grid;
@@ -19,6 +21,8 @@ public class Tetris
     {
         tetromino.SetOnGrid(_startPosition);
         _currentTetromino = tetromino;
+        
+        OnTetrominoAdded?.Invoke(tetromino);
     }
 
     public void Play()
@@ -34,8 +38,6 @@ public class Tetris
         }
         else
         {
-            // On remet l'ancien tetromino
-
             _grid.Fill(oldCells, _currentTetromino.Color);
             _grid.CheckForCompletedLines();
             AddTetromino(Tetromino.CreateSquareTetromino());

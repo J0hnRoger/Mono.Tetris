@@ -54,7 +54,6 @@ public class GameTests
             new(1, 0, true),
             new(1, 1, true),
         };
-        return new Tetromino(square, new Color("Purple"));
+        return new Tetromino("square", square, new Color("Purple"));
     }
-    
 }

@@ -2,6 +2,8 @@
 
 public class Tetromino
 {
+    public string Type { get; set; }
+
     private static readonly List<Func<Tetromino>> TetrominoPool = new List<Func<Tetromino>>
     {
         CreateSquareTetromino,
@@ -19,13 +21,15 @@ public class Tetromino
     }
 
     public Position? CurrentPosition { get; set; }
+    public string Name { get; }
     public List<Cell> Cells { get; }
     public bool IsOnGrid => CurrentPosition != null;
 
     public Color Color;
 
-    public Tetromino(List<Cell> cells, Color color)
+    public Tetromino(string name, List<Cell> cells, Color color)
     {
+        Name = name;
         Cells = cells;
         Color = color;
     }
@@ -83,7 +87,7 @@ public class Tetromino
         {
             new(0, 0, true), new(0, 1, true), new(1, 0, true), new(1, 1, true),
         };
-        return new Tetromino(square, new Color("Orange"));
+        return new Tetromino("square", square, new Color("Orange"));
     }
 
     // Pièce en ligne (4x1)
@@ -93,7 +97,7 @@ public class Tetromino
         {
             new(0, 0, true), new(0, 1, true), new(0, 2, true), new(0, 3, true),
         };
-        return new Tetromino(line, new Color("Red"));
+        return new Tetromino("line", line, new Color("Red"));
     }
 
     // Pièce en T
@@ -103,7 +107,7 @@ public class Tetromino
         {
             new(1, 0, true), new(0, 1, true), new(1, 1, true), new(2, 1, true),
         };
-        return new Tetromino(tShape, new Color("Green"));
+        return new Tetromino("T", tShape, new Color("Green"));
     }
 
     // Pièce en L
@@ -113,7 +117,7 @@ public class Tetromino
         {
             new(0, 0, true), new(0, 1, true), new(0, 2, true), new(1, 2, true),
         };
-        return new Tetromino(lShape, new Color("Blue"));
+        return new Tetromino("L", lShape, new Color("Blue"));
     }
 
     // Pièce en Z
@@ -123,8 +127,16 @@ public class Tetromino
         {
             new(0, 0, true), new(1, 0, true), new(1, 1, true), new(2, 1, true),
         };
-        return new Tetromino(zShape, new Color("Cyan"));
+        return new Tetromino("Z", zShape, new Color("Cyan"));
     }
 
     #endregion
+
+    public static Tetromino FromName(string name)
+    {
+        return TetrominoPool
+                   .Select(createTetromino => createTetromino()) 
+                   .FirstOrDefault(tetromino => tetromino.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+               ?? throw new ArgumentException($"Invalid Tetromino name: {name}");
+    }
 }

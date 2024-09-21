@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "LKt1VIysyW4FglLRC9WzRwMh7xRqNe2U1WFMu+b2oJ8=",
+  "Source": "Tetris.Server",
+  "BasePath": "_content/Tetris.Server",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

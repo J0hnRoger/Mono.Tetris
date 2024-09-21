@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Threading.Tasks;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Mono.Tetris.Game.Common;
@@ -51,9 +52,9 @@ public class LobbyScreen : IScreen
 
         // Afficher le champ de texte pour le nom du joueur
         spriteBatch.DrawString(_font, "Entrez votre nom:", new Vector2(100, 100), Color.White);
-        
+
         _inputText.Draw(spriteBatch, _font, new Vector2(100, 150), Color.Yellow);
-        
+
         // Si en attente, afficher un message
         if (_isWaitingForOpponent)
         {
@@ -87,12 +88,14 @@ public class LobbyScreen : IScreen
         _signalRClient.SendPlayerName(_inputText.Text);
 
         // Écouter le signal du serveur pour savoir quand le match peut démarrer
-        _signalRClient.OnMatchFound(() =>
+        _signalRClient.OnStartGame(() =>
         {
             _gameStarted = true;
 
             // Utilise le ScreenManager pour accéder aux ressources graphiques
-            var gameScreen = new GameScreen(_screenManager.GetSpriteBatch(), _screenManager.GetGraphicsDevice());
+            var gameScreen = new GameScreen(_screenManager.GetSpriteBatch(), _screenManager.GetGraphicsDevice(),
+                _signalRClient);
+            
             _screenManager.ChangeScreen(gameScreen);
         });
     }
