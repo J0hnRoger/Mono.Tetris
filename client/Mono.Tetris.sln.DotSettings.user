@@ -1,0 +1,8 @@
+﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=b3586ccb_002D20b9_002D4b93_002Dbf51_002Dd1115b39538e/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="Game_InitGrid" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;xUnit::7F372642-5931-4B50-A820-9934233DE67F::net8.0::Mono.Tetris.Tests.GameTests.Game_InitGrid&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::7F372642-5931-4B50-A820-9934233DE67F::net8.0::Mono.Tetris.Tests.GameTests.Game_Render_UpdatedGrid&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::7F372642-5931-4B50-A820-9934233DE67F::net8.0::Mono.Tetris.Tests.GameTests.Position_Comparison&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>

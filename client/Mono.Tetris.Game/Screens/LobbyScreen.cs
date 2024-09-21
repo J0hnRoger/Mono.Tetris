@@ -27,7 +27,7 @@ public class LobbyScreen : IScreen
         _spriteBatch = spriteBatch;
         _font = font;
         _signalRClient = signalRClient;
-        _inputText = new InputText(10);
+        _inputText = new InputText(20);
     }
 
     public void Update(GameTime gameTime)
