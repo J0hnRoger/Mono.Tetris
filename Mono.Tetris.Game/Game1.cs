@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Mono.Tetris.Game.Common;
-using Mono.Tetris.Game.Extensions;
+using Mono.Tetris.Game.Infrastructure;
 using Mono.Tetris.Game.Screens;
 
 namespace Mono.Tetris.Game;
@@ -28,6 +28,8 @@ public class Game1 : Microsoft.Xna.Framework.Game
     private int rows = 20;
 
     private KeyboardState _previousKeyboardState;
+    private SpriteFont _font;
+    private SignalRClient _signalRClient;
 
     public Game1()
     {
@@ -41,15 +43,15 @@ public class Game1 : Microsoft.Xna.Framework.Game
     protected override void Initialize()
     {
         // Calculer la taille nécessaire pour contenir la grille
-        int windowWidth = columns * cellSize; // Largeur de la fenêtre en fonction des colonnes
-        int windowHeight = rows * cellSize; // Hauteur de la fenêtre en fonction des lignes
+        int windowWidth = columns * cellSize * 2; // Largeur de la fenêtre en fonction des colonnes
+        int windowHeight = rows * cellSize* 2; // Hauteur de la fenêtre en fonction des lignes
 
         // Définir la taille de la fenêtre
         _graphics.PreferredBackBufferWidth = windowWidth;
         _graphics.PreferredBackBufferHeight = windowHeight;
         _graphics.ApplyChanges(); // Appliquer les modifications
-        
-        _screenManager = new ScreenManager(new GameScreen(_spriteBatch, GraphicsDevice));
+
+        _screenManager = new ScreenManager(GraphicsDevice, _spriteBatch);
         
         base.Initialize();
     }
@@ -57,14 +59,21 @@ public class Game1 : Microsoft.Xna.Framework.Game
     protected override void LoadContent()
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
+
+        _font = Content.Load<SpriteFont>("fonts/DefaultFont");
+        // _signalRClient = new SignalRClient("https://mon-server.com");
+        // _signalRClient.ConnectAsync().Wait();
         _cellTexture = new Texture2D(GraphicsDevice, 1, 1);
         _cellTexture.SetData(new[] {Color.White});
-        _soundEffect = Content.Load<SoundEffect>("tetris_epicversion");
+        _soundEffect = Content.Load<SoundEffect>("tetris_song2");
 
         _soundEffectInstance = _soundEffect.CreateInstance();
         _soundEffectInstance.IsLooped = true;
 
         _soundEffectInstance.Play();
+        
+        var firstScreen = new LobbyScreen(_screenManager, _spriteBatch, _font, _signalRClient);
+        _screenManager.ChangeScreen(firstScreen);
     }
 
     protected override void Update(GameTime gameTime)
@@ -72,7 +81,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
             Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
-        
+
         _screenManager.Update(gameTime);
 
         base.Update(gameTime);
@@ -82,9 +91,9 @@ public class Game1 : Microsoft.Xna.Framework.Game
     {
         // Nettoyer l'écran
         GraphicsDevice.Clear(Color.CornflowerBlue);
-        
+
         _screenManager.Draw(gameTime, _spriteBatch);
-        
+
         base.Draw(gameTime);
     }
 }
