@@ -11,23 +11,25 @@ namespace Mono.Tetris.Game.Screens;
 public class LobbyScreen : IScreen
 {
     private InputText _inputText;
-    private string _playerName = "";
+
     private bool _isWaitingForOpponent = false;
     private SpriteFont _font;
-    private SpriteBatch _spriteBatch;
     private KeyboardState _previousKeyboardState;
+    private readonly TextWriter _textWriter;
 
     private bool _gameStarted = false; // Booléen pour savoir si le match a commencé
     private ScreenManager _screenManager;
     private SignalRClient _signalRClient; // Gestion de la communication serveur
+    private readonly GameState _gameState;
+    private bool _isInitialized;
 
-    public LobbyScreen(ScreenManager screenManager, SpriteBatch spriteBatch, SpriteFont font,
-        SignalRClient signalRClient)
+    public LobbyScreen(ScreenManager screenManager, SpriteFont font,
+        SignalRClient signalRClient, GameState gameState)
     {
         _screenManager = screenManager;
-        _spriteBatch = spriteBatch;
         _font = font;
         _signalRClient = signalRClient;
+        _gameState = gameState;
         _inputText = new InputText(20);
     }
 
@@ -86,17 +88,14 @@ public class LobbyScreen : IScreen
 
         // Envoyer le nom du joueur au serveur pour débuter le matchmaking
         _signalRClient.SendPlayerName(_inputText.Text);
+        _gameState.PlayerName = _inputText.Text;
 
         // Écouter le signal du serveur pour savoir quand le match peut démarrer
-        _signalRClient.OnStartGame(() =>
+        _signalRClient.OnStartGame((opponentName) =>
         {
             _gameStarted = true;
-
-            // Utilise le ScreenManager pour accéder aux ressources graphiques
-            var gameScreen = new GameScreen(_screenManager.GetSpriteBatch(), _screenManager.GetGraphicsDevice(),
-                _signalRClient);
-            
-            _screenManager.ChangeScreen(gameScreen);
+            _gameState.OpponentName = opponentName;
+            _screenManager.ChangeScreen("GameScreen");
         });
     }
 }

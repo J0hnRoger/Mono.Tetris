@@ -7,7 +7,7 @@ public class GameTests
 {
     private Engine.Tetris CreateGame()
     {
-        var game = new Engine.Tetris(80, 20);
+        var game = new Engine.Tetris(80, 20, "TESTER");
         return game;
     }
 

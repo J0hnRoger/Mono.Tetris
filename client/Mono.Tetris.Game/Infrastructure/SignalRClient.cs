@@ -33,9 +33,14 @@ public class SignalRClient
         await _connection.InvokeAsync("AddToLobby", playerName);
     }
 
-    public void OnStartGame(Action onStartGame)
+    public async void SendPlayerReady(string playerName)
     {
-        _connection.On("StartGame", onStartGame); // Recevoir le signal du serveur pour démarrer le jeu
+        await _connection.InvokeAsync("PlayerReady", playerName);
+    }
+    
+    public void OnStartGame(Action<string> onStartGame)
+    {
+        _connection.On("StartGame", onStartGame);
     }
 
     public async Task SendMove(string move)
@@ -58,6 +63,11 @@ public class SignalRClient
     public void OnTetrominoReceived(Action<string, TetrominoDto> onTetrominoReceived)
     {
         _connection.On("ReceiveTetromino", onTetrominoReceived);
+    }
+
+    public void OnStartMatch(Action onStartMatch)
+    {
+        _connection.On("StartMatch", onStartMatch);
     }
 }
 

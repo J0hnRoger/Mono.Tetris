@@ -2,7 +2,10 @@
 
 public class Tetris
 {
+    public string PlayerName;
+    
     private Tetromino? _currentTetromino;
+    public Tetromino? CurrentTetromino => _currentTetromino;
     private Position _startPosition { get; }
     
     public Action<Tetromino> OnTetrominoAdded;
@@ -10,8 +13,9 @@ public class Tetris
     private Grid _grid;
     public Grid Render() => _grid;
 
-    public Tetris(int rows, int columns)
+    public Tetris(int rows, int columns, string playerName)
     {
+        PlayerName = playerName;
         // O-based index
         _startPosition = new Position(columns / 2, rows);
         _grid = new Grid(rows, columns);
@@ -28,7 +32,7 @@ public class Tetris
     public void Play()
     {
         if (_currentTetromino == null)
-            AddTetromino(Tetromino.CreateRandomTetromino());
+            return;
 
         var oldCells = _currentTetromino!.GetAbsolutePositions();
         _grid.Free(oldCells);
