@@ -10,10 +10,11 @@
 using System;
 using System.Reflection;
 
+[assembly: Microsoft.Extensions.Configuration.UserSecrets.UserSecretsIdAttribute("1e5bb6d9-07e9-4992-9db6-658ca999a00a")]
 [assembly: System.Reflection.AssemblyCompanyAttribute("Tetris.Server")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+abbd5d0c08af78b9c263ec024a07b4528deb2a64")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ccc2a8c7172ff18d69ec6b8712cf745ea8442855")]
 [assembly: System.Reflection.AssemblyProductAttribute("Tetris.Server")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Tetris.Server")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

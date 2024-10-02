@@ -2,13 +2,13 @@
 
 public class TetrominoFactory : ITetrominoFactory
 {
-    
-}
-
-public interface ITetrominoFactory {
-    
     public Tetromino GetRandom()
     {
         return Tetromino.CreateRandomTetromino();
     }
+}
+
+public interface ITetrominoFactory
+{
+    public Tetromino GetRandom();
 }

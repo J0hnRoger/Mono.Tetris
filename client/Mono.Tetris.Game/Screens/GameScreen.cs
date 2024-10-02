@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using Mono.Tetris.Engine;
 using Mono.Tetris.Game.Common;
 using Mono.Tetris.Game.Extensions;
@@ -14,11 +14,10 @@ namespace Mono.Tetris.Game.Screens;
 public class GameScreen : IScreen
 {
     private readonly SignalRClient _signalRClient;
+
     private double _timeSinceLastUpdate;
     private const double _updateInterval = 0.5;
 
-    private KeyboardState _previousKeyboardState;
-    private SpriteBatch _spriteBatch;
     private readonly TextWriter _textWriter;
     private Texture2D _cellTexture;
 
@@ -28,36 +27,45 @@ public class GameScreen : IScreen
 
     private readonly Engine.Tetris _tetrisGame;
     private readonly Engine.Tetris _opponentTetrisGame;
-    
+
     private bool _allPlayersReady;
     private ITetrominoFactory _tetrominoFactory;
+    private InputManager _inputManager;
+    private NetworkInputManager _networkInputManager;
 
-    public GameScreen(GameState gameState, SpriteBatch spriteBatch, GraphicsDevice graphicsDevice,
+    public GameScreen(GameState gameState, GraphicsDevice graphicsDevice,
         TextWriter textWriter, SignalRClient signalRClient)
     {
         if (string.IsNullOrEmpty(gameState.OpponentName) || string.IsNullOrEmpty(gameState.PlayerName))
             throw new NullReferenceException("Names of the players should be filled");
-        
+
         // Permet d'injecter par la suite la factory du server ou du client
         // en fonction du mode local ou online
         _tetrominoFactory = new TetrominoFactory();
         _signalRClient = signalRClient;
+
+        _inputManager = new InputManager();
+        _inputManager.OnMoveExecuted += move => {
+            Task.Run(async () => await _signalRClient.SendMove(move.ToString().ToLower()));
+        };
+        
+        // Manager pour relayer les mouvements de l'adversaire 
+        _networkInputManager = new NetworkInputManager();
+
         _tetrisGame = new Engine.Tetris(rows, columns, gameState.PlayerName);
         _tetrisGame.OnTetrominoAdded += TetrominoAdded;
 
         _opponentTetrisGame = new Engine.Tetris(rows, columns, gameState.OpponentName);
-            
-        _spriteBatch = spriteBatch;
+
         _textWriter = textWriter;
         _cellTexture = new Texture2D(graphicsDevice, 1, 1);
-        _cellTexture.SetData(new[] {Color.White});
+        _cellTexture.SetData(new[] { Color.White });
 
         _signalRClient.OnMoveReceived(OnOpponentMoveReceived);
         _signalRClient.OnTetrominoReceived(OnTetrominoReceived);
-        
+
         _signalRClient.SendPlayerReady(gameState.PlayerName);
-        _signalRClient.OnStartMatch(() =>
-        {
+        _signalRClient.OnStartMatch(() => {
             _allPlayersReady = true;
         });
     }
@@ -90,10 +98,10 @@ public class GameScreen : IScreen
                 _opponentTetrisGame.RotateTetromio();
                 break;
             case "down":
-                _opponentTetrisGame.MoveTetromino(0, -1); 
+                _opponentTetrisGame.MoveTetromino(0, -1);
                 break;
             case "drop":
-                _opponentTetrisGame.DropTetromino(); 
+                _opponentTetrisGame.DropTetromino();
                 break;
             default:
                 Debug.WriteLine($"Unknown move: {move}");
@@ -105,43 +113,23 @@ public class GameScreen : IScreen
     {
         if (!_allPlayersReady)
             return;
-        
-        if(_tetrisGame.CurrentTetromino == null) 
+
+        if (_tetrisGame.CurrentTetromino == null)
             _tetrisGame.AddTetromino(_tetrominoFactory.GetRandom());
-        
+
         double deltaTime = gameTime.ElapsedGameTime.TotalSeconds;
         _timeSinceLastUpdate += deltaTime;
 
-        var keyboardState = Keyboard.GetState();
-        if (keyboardState.IsKeyDown(Keys.Up) && !_previousKeyboardState.IsKeyDown(Keys.Up))
+        var localAction = _inputManager.GetInput(gameTime);
+        if (localAction != null)
         {
-            _tetrisGame.RotateTetromio();
-            _ = _signalRClient.SendMove("rotate");
+            Debug.WriteLine($"Input pressed {localAction}");
+            localAction.Execute(_tetrisGame);
         }
 
-        if (keyboardState.IsKeyDown(Keys.Left) && !_previousKeyboardState.IsKeyDown(Keys.Left))
-        {
-            _tetrisGame.MoveTetromino(-1, 0); // Déplacement vers la gauche
-            _ = _signalRClient.SendMove("left");
-        }
-
-        if (keyboardState.IsKeyDown(Keys.Right) && !_previousKeyboardState.IsKeyDown(Keys.Right))
-        {
-            _tetrisGame.MoveTetromino(1, 0); // Déplacement vers la droite
-            _ = _signalRClient.SendMove("right");
-        }
-
-        if (keyboardState.IsKeyDown(Keys.Down) && !_previousKeyboardState.IsKeyDown(Keys.Down))
-        {
-            _tetrisGame.MoveTetromino(0, -1); // Déplacement vers le bas
-            _ = _signalRClient.SendMove("down");
-        }
-
-        if (keyboardState.IsKeyDown(Keys.Space) && !_previousKeyboardState.IsKeyDown(Keys.Space))
-        {
-            _tetrisGame.DropTetromino();
-            _ = _signalRClient.SendMove("drop");
-        }
+        var networkAction = _networkInputManager.GetNetworkInput();
+        if (networkAction != null)
+            networkAction.Execute(_opponentTetrisGame);
 
         if (_timeSinceLastUpdate >= _updateInterval)
         {
@@ -150,8 +138,6 @@ public class GameScreen : IScreen
 
             _timeSinceLastUpdate = 0;
         }
-
-        _previousKeyboardState = keyboardState;
     }
 
     public void Draw(GameTime gameTime, SpriteBatch spriteBatch)

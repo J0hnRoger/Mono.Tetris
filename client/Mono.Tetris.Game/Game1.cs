@@ -76,7 +76,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
         _screenManager.RegisterScene("LobbyScreen",
             () => new LobbyScreen(_screenManager, _font, _signalRClient, _gameState));
         _screenManager.RegisterScene("GameScreen",
-            () => new GameScreen(_gameState, _spriteBatch, GraphicsDevice, _textWriter, _signalRClient));
+            () => new GameScreen(_gameState, GraphicsDevice, _textWriter, _signalRClient));
         
         _screenManager.ChangeScreen("LobbyScreen");
     }
